@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PermitAI — Building Permit Assistant | Evans Engineering</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --forest:  #1a3a2a;
+  --forest2: #1f4733;
+  --forest3: #234d38;
+  --leaf:    #2d6a4f;
+  --mint:    #52b788;
+  --lime:    #95d5b2;
+  --cream:   #fefdf8;
+  --warm:    #f4f1e8;
+  --rule:    #ddd8c4;
+  --rule2:   #e8e4d8;
+  --ink:     #1a1f14;
+  --muted:   #6b7a62;
+  --surface: #ffffff;
+  --amber:   #e07b39;
+  --red:     #c0392b;
+  --blue:    #2563a8;
+  --shadow:  0 2px 20px rgba(26,58,42,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{
+  height:auto;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;max-width:100vw;
+}
+body{
+  font-family:'IBM Plex Sans',sans-serif;
+  background:var(--cream);color:var(--ink);
+  min-height:100vh;overflow-x:hidden;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;
+  position:relative;
+}
+
+/* ── CIVIC TEXTURE ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      rgba(26,58,42,0.04) 39px,
+      rgba(26,58,42,0.04) 40px
+    );
+  pointer-events:none;z-index:0;
+}
+
+/* ── TOP ACCENT BAR ── */
+.accent-bar{
+  height:4px;
+  background:linear-gradient(90deg,var(--forest) 0%,var(--mint) 50%,var(--forest) 100%);
+}
+
+.wrap{max-width:960px;margin:0 auto;padding:0 24px;position:relative;z-index:1;width:100%;overflow-x:hidden;}
+
+/* ── HEADER ── */
+header{
+  padding:20px 0 18px;
+  border-bottom:2px solid var(--forest);
+  display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;gap:12px;
+}
+.brand{display:flex;align-items:center;gap:14px;}
+.brand-icon{
+  width:40px;height:40px;
+  background:var(--forest);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.brand-text{}
+.brand-name{
+  font-family:'Fraunces',serif;
+  font-size:22px;font-weight:900;
+  color:var(--forest);letter-spacing:-0.5px;line-height:1;
+}
+.brand-name span{color:var(--mint);}
+.brand-tag{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1.5px;
+  margin-top:2px;
+}
+.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.token-pill{
+  display:flex;align-items:center;gap:8px;
+  background:var(--forest);
+  border-radius:3px;padding:6px 14px;
+}
+.tp-label{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1.5px;}
+.tp-count{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--lime);line-height:1;}
+.tp-unit{font-size:10px;color:rgba(255,255,255,0.4);}
+.buy-btn{
+  background:var(--mint);color:var(--forest);
+  border:none;border-radius:3px;
+  padding:8px 16px;font-size:11px;
+  font-family:'IBM Plex Mono',monospace;
+  cursor:pointer;letter-spacing:0.5px;
+  text-transform:uppercase;font-weight:500;
+  transition:background 0.15s;
+}
+.buy-btn:hover{background:var(--lime);}
+
+/* ── HERO ── */
+.hero{
+  padding:52px 0 36px;
+  display:grid;grid-template-columns:1fr 380px;
+  gap:48px;align-items:center;
+}
+.hero-left h1{
+  font-family:'Fraunces',serif;
+  font-size:clamp(34px,5vw,56px);
+  font-weight:900;line-height:1.0;
+  color:var(--forest);margin-bottom:16px;
+  letter-spacing:-1px;
+}
+.hero-left h1 em{
+  font-style:italic;color:var(--mint);
+}
+.hero-left p{
+  font-size:14px;color:var(--muted);
+  line-height:1.75;margin-bottom:22px;max-width:440px;
+}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px;}
+.hbadge{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;padding:4px 10px;border-radius:2px;
+  border:1px solid;text-transform:uppercase;letter-spacing:1px;
+}
+.hbadge-green{border-color:var(--leaf);color:var(--leaf);background:rgba(45,106,79,0.06);}
+.hbadge-amber{border-color:var(--amber);color:var(--amber);background:rgba(224,123,57,0.06);}
+.hbadge-ink{border-color:var(--rule);color:var(--muted);}
+
+/* HERO RIGHT — process steps */
+.hero-right{
+  background:var(--forest);
+  border-radius:6px;padding:24px;
+  color:var(--cream);
+}
+.hr-title{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;text-transform:uppercase;
+  letter-spacing:2px;color:var(--lime);
+  margin-bottom:16px;
+}
+.process-steps{display:flex;flex-direction:column;gap:0;}
+.ps-item{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.ps-item:last-child{border-bottom:none;}
+.ps-num{
+  width:24px;height:24px;
+  background:var(--leaf);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;color:var(--lime);
+  flex-shrink:0;margin-top:1px;
+  font-weight:500;
+}
+.ps-text{}
+.ps-step{font-size:12px;font-weight:600;color:var(--cream);margin-bottom:2px;}
+.ps-desc{font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;}
+
+/* ── FORM ── */
+.form-card{
+  background:var(--surface);
+  border:1px solid var(--rule2);
+  border-top:3px solid var(--forest);
+  border-radius:4px;padding:36px;
+  margin-bottom:24px;
+  position:relative;z-index:1;
+  box-shadow:var(--shadow);
+  width:100%;
+  overflow:hidden;
+}
+.form-title{
+  font-family:'Fraunces',serif;
+  font-size:22px;font-weight:700;
+  color:var(--forest);margin-bottom:6px;
+}
+.form-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.6;}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.span2{grid-column:1/-1;}
+
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;text-transform:uppercase;
+  letter-spacing:1.5px;color:var(--muted);
+  font-weight:500;
+}
+.field input,.field select,.field textarea{
+  background:var(--warm);
+  border:1px solid var(--rule2);
+  border-radius:3px;padding:11px 14px;
+  font-family:'IBM Plex Sans',sans-serif;
+  font-size:14px;color:var(--ink);outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;
+  -webkit-appearance:none;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--leaf);
+  box-shadow:0 0 0 3px rgba(45,106,79,0.1);
+  background:var(--surface);
+}
+.field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%236b7a62' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  padding-right:36px;cursor:pointer;
+}
+.field textarea{resize:vertical;min-height:90px;line-height:1.6;}
+
+.chips-label{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;text-transform:uppercase;
+  letter-spacing:1.5px;color:var(--muted);
+  margin-bottom:8px;display:block;
+}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;width:100%;max-width:100%;}
+.chip{
+  padding:6px 14px;border-radius:3px;
+  border:1px solid var(--rule2);
+  font-family:'IBM Plex Sans',sans-serif;
+  font-size:12px;font-weight:500;
+  cursor:pointer;transition:all 0.15s;color:var(--muted);
+  user-select:none;position:relative;z-index:2;
+  pointer-events:auto;-webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.chip *{pointer-events:none;}
+.chip:hover{border-color:var(--leaf);color:var(--forest);}
+.chip.active{background:var(--forest);border-color:var(--forest);color:var(--lime);}
+
+.form-divider{
+  height:1px;background:var(--rule2);
+  margin:24px 0;position:relative;
+}
+.form-divider::before{
+  content:attr(data-label);
+  position:absolute;top:-9px;left:16px;
+  background:var(--surface);padding:0 10px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;color:var(--muted);
+  letter-spacing:1.5px;text-transform:uppercase;
+}
+
+/* GENERATE BUTTON */
+.gen-btn{
+  width:100%;padding:17px;
+  background:var(--forest);
+  border:none;border-radius:3px;
+  font-family:'Fraunces',serif;
+  font-size:19px;font-weight:700;
+  color:var(--lime);cursor:pointer;
+  transition:all 0.2s;letter-spacing:0.3px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  margin-top:8px;
+}
+.gen-btn:hover{
+  background:var(--forest2);
+  transform:translateY(-1px);
+  box-shadow:0 6px 24px rgba(26,58,42,0.25);
+}
+.gen-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* ── LOADING ── */
+.loading{
+  display:none;background:var(--surface);
+  border:1px solid var(--rule2);border-radius:4px;
+  padding:52px 36px;text-align:center;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.loading.show{display:block;animation:fadeUp 0.3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.loading-spinner{
+  width:44px;height:44px;
+  border:3px solid var(--rule2);
+  border-top-color:var(--leaf);
+  border-radius:50%;
+  margin:0 auto 20px;
+  animation:spin 0.9s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-title{
+  font-family:'Fraunces',serif;
+  font-size:20px;font-weight:700;
+  color:var(--forest);margin-bottom:8px;
+}
+#loading-msg{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1px;
+}
+
+/* ── RESULTS ── */
+#results{display:none;animation:fadeUp 0.4s ease;}
+
+/* PERMIT SUMMARY HEADER */
+.permit-header{
+  background:var(--forest);color:var(--cream);
+  border-radius:6px;padding:28px 32px;
+  margin-bottom:20px;
+  display:flex;align-items:flex-start;
+  justify-content:space-between;gap:20px;
+  flex-wrap:wrap;
+}
+.ph-left{}
+.ph-label{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;text-transform:uppercase;
+  letter-spacing:2px;color:var(--lime);
+  margin-bottom:8px;
+}
+.ph-title{
+  font-family:'Fraunces',serif;
+  font-size:clamp(20px,3.5vw,30px);
+  font-weight:900;color:var(--cream);
+  line-height:1.15;margin-bottom:8px;
+}
+.ph-sub{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.5;}
+.ph-right{
+  display:flex;flex-direction:column;gap:10px;
+  min-width:200px;
+}
+.ph-stat{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:3px;padding:12px 16px;
+  text-align:center;
+}
+.ph-stat-label{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:8px;text-transform:uppercase;
+  letter-spacing:1.5px;color:rgba(255,255,255,0.4);
+  margin-bottom:4px;
+}
+.ph-stat-val{
+  font-family:'Fraunces',serif;
+  font-size:20px;font-weight:700;color:var(--lime);
+  line-height:1;
+}
+.ph-stat-sub{font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;}
+
+/* SECTION CARDS */
+.section-card{
+  background:var(--surface);
+  border:1px solid var(--rule2);
+  border-radius:4px;overflow:hidden;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
+.sc-header{
+  padding:14px 20px;
+  border-bottom:1px solid var(--rule2);
+  background:var(--warm);
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;user-select:none;
+  transition:background 0.15s;
+}
+.sc-header:hover{background:var(--rule2);}
+.sc-icon{font-size:16px;flex-shrink:0;}
+.sc-title{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;text-transform:uppercase;
+  letter-spacing:1.5px;color:var(--forest);
+  font-weight:500;flex:1;
+}
+.sc-toggle{
+  font-size:11px;color:var(--muted);
+  transition:transform 0.2s;
+  font-family:'IBM Plex Mono',monospace;
+}
+.section-card.open .sc-toggle{transform:rotate(180deg);}
+.sc-body{
+  display:none;padding:24px 28px;
+  font-size:14px;color:var(--ink);line-height:1.8;
+}
+.section-card.open .sc-body{
+  display:block;animation:fadeUp 0.2s ease;
+}
+
+/* RICH CONTENT STYLES */
+.sc-body h3{
+  font-family:'Fraunces',serif;
+  font-size:17px;font-weight:700;
+  color:var(--forest);margin:20px 0 10px;
+  border-bottom:1px solid var(--rule2);
+  padding-bottom:6px;
+}
+.sc-body h3:first-child{margin-top:0;}
+.sc-body h4{
+  font-family:'IBM Plex Sans',sans-serif;
+  font-size:13px;font-weight:600;
+  color:var(--forest);margin:14px 0 6px;
+  text-transform:uppercase;letter-spacing:0.5px;
+}
+.sc-body p{margin-bottom:12px;color:var(--ink);}
+.sc-body ul,.sc-body ol{
+  padding-left:20px;margin-bottom:14px;
+}
+.sc-body li{margin-bottom:7px;color:var(--ink);}
+.sc-body strong{color:var(--forest);font-weight:600;}
+
+/* TABLES */
+.sc-body .table-wrap{
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  margin-bottom:16px;border-radius:3px;
+  border:1px solid var(--rule2);
+}
+/* ALL tables scroll horizontally — regardless of wrapper */
+.sc-body table{
+  border-collapse:collapse;
+  font-size:13px;
+  min-width:480px;
+  /* Make table itself a scrollable block */
+  display:block;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  width:100%;
+  max-width:100%;
+}
+/* Restore proper table layout for thead/tbody/tr */
+.sc-body table thead,
+.sc-body table tbody,
+.sc-body table tfoot{
+  display:table;
+  width:100%;
+}
+.sc-body table tr{display:table-row;}
+.sc-body table th,
+.sc-body table td{display:table-cell;}
+.sc-body table th{
+  background:var(--forest);color:var(--lime);
+  padding:10px 14px;text-align:left;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;text-transform:uppercase;
+  letter-spacing:1px;white-space:nowrap;
+}
+.sc-body table td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--rule2);
+  color:var(--ink);vertical-align:top;
+}
+.sc-body table tr:nth-child(even) td{background:var(--warm);}
+.sc-body table tr:last-child td{border-bottom:none;}
+
+/* CHECKLIST ITEMS */
+.checklist-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:10px 14px;border-radius:3px;
+  border:1px solid var(--rule2);
+  background:var(--warm);
+  margin-bottom:8px;
+  transition:border-color 0.15s;
+}
+.checklist-item:hover{border-color:var(--leaf);}
+.ci-num{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;color:var(--mint);
+  background:var(--forest);
+  border-radius:2px;padding:2px 6px;
+  flex-shrink:0;margin-top:1px;font-weight:500;
+}
+.ci-text{font-size:13px;color:var(--ink);line-height:1.5;}
+.ci-req{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:8px;text-transform:uppercase;
+  letter-spacing:1px;margin-top:3px;
+}
+.ci-mandatory{color:var(--red);}
+.ci-standard{color:var(--blue);}
+.ci-conditional{color:var(--amber);}
+
+/* CALLOUT BOXES */
+.callout{
+  border-radius:3px;padding:14px 18px;
+  margin:14px 0;font-size:13px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.callout-warn{
+  background:rgba(224,123,57,0.08);
+  border:1px solid rgba(224,123,57,0.25);
+  border-left:3px solid var(--amber);
+}
+.callout-info{
+  background:rgba(37,99,168,0.06);
+  border:1px solid rgba(37,99,168,0.2);
+  border-left:3px solid var(--blue);
+}
+.callout-success{
+  background:rgba(45,106,79,0.07);
+  border:1px solid rgba(45,106,79,0.2);
+  border-left:3px solid var(--leaf);
+}
+.callout-icon{font-size:16px;flex-shrink:0;}
+.callout-body{}
+.callout-title{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;font-weight:500;
+  text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:4px;color:var(--forest);
+}
+.callout-body p{margin-bottom:0;font-size:13px;color:var(--muted);}
+
+/* TIMELINE */
+.timeline{display:flex;flex-direction:column;gap:0;}
+.tl-item{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:12px 0;position:relative;
+}
+.tl-item:not(:last-child)::before{
+  content:'';position:absolute;
+  left:11px;top:36px;bottom:-12px;width:2px;
+  background:var(--rule2);
+}
+.tl-dot{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--forest);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:var(--lime);flex-shrink:0;
+  font-family:'IBM Plex Mono',monospace;font-weight:500;
+  position:relative;z-index:1;margin-top:1px;
+}
+.tl-content{}
+.tl-step{font-size:13px;font-weight:600;color:var(--forest);margin-bottom:3px;}
+.tl-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+.tl-duration{
+  display:inline-block;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;padding:2px 7px;border-radius:2px;
+  background:rgba(45,106,79,0.1);
+  border:1px solid rgba(45,106,79,0.2);
+  color:var(--leaf);margin-top:4px;
+  text-transform:uppercase;letter-spacing:0.5px;
+}
+
+/* EXPAND/COLLAPSE ALL */
+.expand-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.expand-bar span{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1.5px;
+}
+.expand-all-btn{
+  font-family:'IBM Plex Mono',monospace;font-size:9px;
+  color:var(--leaf);background:none;
+  border:1px solid rgba(45,106,79,0.3);
+  border-radius:2px;padding:4px 12px;
+  cursor:pointer;text-transform:uppercase;
+  letter-spacing:0.5px;transition:all 0.15s;
+}
+.expand-all-btn:hover{background:rgba(45,106,79,0.08);}
+
+/* ACTIONS */
+.actions-bar{
+  display:flex;gap:12px;margin-bottom:36px;flex-wrap:wrap;
+}
+.act-btn{
+  padding:12px 24px;border-radius:3px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;font-weight:500;cursor:pointer;
+  transition:all 0.15s;text-transform:uppercase;
+  letter-spacing:0.5px;border:none;
+}
+.act-primary{background:var(--forest);color:var(--lime);}
+.act-primary:hover{background:var(--forest2);}
+.act-secondary{background:transparent;border:1px solid var(--rule2);color:var(--muted);}
+.act-secondary:hover{border-color:var(--leaf);color:var(--leaf);}
+
+/* ── PAYWALL MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(10,20,14,0.92);
+  backdrop-filter:blur(10px);
+  align-items:center;justify-content:center;
+  padding:24px;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;
+}
+.modal-overlay.show{display:flex;animation:fadeIn 0.2s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal{
+  background:var(--surface);
+  border:1px solid var(--rule2);
+  border-top:3px solid var(--forest);
+  border-radius:4px;max-width:520px;width:100%;
+  padding:36px 32px;position:relative;
+  animation:slideUp 0.25s ease;
+  max-height:90vh;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;margin:0;
+}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal-close{
+  position:absolute;top:14px;right:16px;
+  background:none;border:none;font-size:20px;
+  cursor:pointer;color:var(--muted);transition:color 0.15s;
+}
+.modal-close:hover{color:var(--forest);}
+.modal h2{
+  font-family:'Fraunces',serif;
+  font-size:26px;font-weight:900;
+  color:var(--forest);margin-bottom:6px;
+}
+.modal-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px;}
+.modal-sub strong{color:var(--forest);}
+
+.bundles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.bundle{
+  background:var(--warm);border:1px solid var(--rule2);
+  border-radius:3px;padding:18px 12px;
+  text-align:center;cursor:pointer;
+  transition:all 0.15s;position:relative;
+}
+.bundle:hover{border-color:var(--leaf);}
+.bundle.selected{border-color:var(--forest);background:rgba(26,58,42,0.06);}
+.b-badge{
+  position:absolute;top:-10px;left:50%;
+  transform:translateX(-50%);
+  background:var(--forest);color:var(--lime);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:8px;padding:2px 10px;border-radius:2px;
+  white-space:nowrap;text-transform:uppercase;letter-spacing:0.5px;
+}
+.b-name{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;text-transform:uppercase;
+  letter-spacing:1px;color:var(--muted);margin-bottom:6px;
+}
+.b-tokens{
+  font-family:'Fraunces',serif;
+  font-size:34px;font-weight:900;color:var(--forest);line-height:1;
+}
+.b-unit{font-size:10px;color:var(--muted);margin-bottom:8px;}
+.b-price{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:18px;color:var(--ink);font-weight:500;
+}
+.b-per{font-size:10px;color:var(--muted);margin-top:3px;}
+
+.pay-btn{
+  width:100%;padding:14px;background:var(--forest);
+  border:none;border-radius:3px;
+  font-family:'IBM Plex Sans',sans-serif;
+  font-size:15px;font-weight:600;
+  color:var(--lime);cursor:pointer;
+  transition:background 0.2s;
+  display:flex;align-items:center;
+  justify-content:center;gap:10px;margin-bottom:10px;
+}
+.pay-btn:hover{background:var(--forest2);}
+
+.di-cards{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.di-card{
+  display:flex;align-items:flex-start;gap:10px;
+  background:var(--warm);border:1px solid var(--rule2);
+  border-radius:3px;padding:10px 12px;
+}
+.di-icon{font-size:16px;flex-shrink:0;line-height:1.5;}
+.di-title{font-size:12px;font-weight:600;color:var(--forest);margin-bottom:2px;}
+.di-desc{font-size:11px;color:var(--muted);line-height:1.4;}
+
+.redeem-sec{margin-top:18px;border-top:1px solid var(--rule2);padding-top:16px;}
+.redeem-sec p{font-size:12px;color:var(--muted);margin-bottom:8px;}
+.redeem-row{display:flex;gap:8px;}
+.redeem-row input{
+  flex:1;background:var(--warm);border:1px solid var(--rule2);
+  border-radius:3px;padding:10px 12px;
+  font-family:'IBM Plex Mono',monospace;font-size:16px;
+  color:var(--ink);outline:none;
+  text-transform:uppercase;letter-spacing:1px;
+  -webkit-appearance:none;
+}
+.redeem-row input:focus{border-color:var(--leaf);}
+.redeem-btn{
+  background:var(--warm);border:1px solid var(--rule2);
+  color:var(--ink);padding:10px 16px;border-radius:3px;
+  cursor:pointer;font-family:'IBM Plex Mono',monospace;
+  font-size:10px;white-space:nowrap;
+  transition:all 0.15s;text-transform:uppercase;
+}
+.redeem-btn:hover{border-color:var(--leaf);color:var(--leaf);}
+.redeem-msg{font-size:11px;margin-top:8px;font-family:'IBM Plex Mono',monospace;}
+
+footer{
+  padding:28px 0;text-align:center;
+  color:var(--muted);font-size:11px;
+  border-top:2px solid var(--forest);margin-top:48px;
+  font-family:'IBM Plex Mono',monospace;
+  line-height:1.9;letter-spacing:0.3px;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+
+  /* ── GLOBAL CONTAINMENT ── */
+  html,body{ overflow-x:hidden; max-width:100vw; }
+  .wrap{ padding:0 14px; overflow-x:hidden; }
+
+  /* ── HEADER ── */
+  header{ padding:12px 0 10px; flex-direction:column; align-items:flex-start; gap:10px; }
+  .brand-name{ font-size:18px; }
+  .brand-tag{ font-size:8px; }
+  .hdr-right{ width:100%; justify-content:space-between; }
+  .tp-count{ font-size:18px; }
+  .buy-btn{ padding:7px 14px; font-size:10px; }
+
+  /* ── HERO ── */
+  .hero{ grid-template-columns:1fr; padding:24px 0 16px; gap:12px; }
+  .hero-right{ display:none; }
+  .hero-left h1{ font-size:clamp(24px,7.5vw,34px); }
+  .hero-left p{ font-size:13px; }
+  .hbadge{ font-size:8px; padding:3px 8px; }
+
+  /* ── FORM CARD ── */
+  .form-card{ padding:18px 14px; }
+  .form-title{ font-size:18px; }
+  .form-sub{ font-size:12px; margin-bottom:20px; }
+  .form-grid{ grid-template-columns:1fr; gap:14px; }
+  .span2{ grid-column:1; }
+
+  /* ── INPUTS — font-size:16px CRITICAL to prevent iOS zoom ── */
+  .field input,
+  .field select,
+  .field textarea{
+    font-size:16px;
+    padding:13px 14px;
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+  }
+  .field label{ font-size:8px; letter-spacing:1px; }
+  .field textarea{ min-height:80px; }
+
+  /* ── CHIPS ── */
+  .chips{ gap:6px; width:100%; max-width:100%; }
+  .chip{
+    font-size:11px;
+    padding:7px 12px;
+    min-height:36px;
+    display:inline-flex;
+    align-items:center;
+    white-space:nowrap;
+  }
+  .chips-label{ font-size:8px; }
+
+  /* ── FORM DIVIDER ── */
+  .form-divider{ margin:18px 0; }
+
+  /* ── GENERATE BUTTON ── */
+  .gen-btn{ padding:15px; font-size:16px; }
+
+  /* ── RESULTS HEADER ── */
+  .permit-header{ flex-direction:column; padding:20px 16px; gap:14px; }
+  .ph-title{ font-size:20px; }
+  .ph-right{ flex-direction:row; min-width:unset; width:100%; gap:8px; }
+  .ph-stat{ flex:1; padding:10px 12px; }
+  .ph-stat-val{ font-size:16px; }
+  .ph-stat-label{ font-size:7px; }
+
+  /* ── SECTION CARDS ── */
+  .sc-header{ padding:12px 14px; }
+  .sc-title{ font-size:10px; letter-spacing:1px; }
+  .sc-body{ padding:16px 14px; font-size:13px; line-height:1.7; }
+  .sc-body h3{ font-size:15px; margin:16px 0 8px; }
+  .sc-body h4{ font-size:12px; }
+
+  /* ── TABLES — horizontal scroll on mobile ── */
+  .sc-body table{
+    font-size:11px;
+    min-width:400px;
+  }
+  .sc-body table th{
+    font-size:8px;
+    padding:7px 9px;
+    white-space:nowrap;
+  }
+  .sc-body table td{
+    padding:7px 9px;
+    font-size:11px;
+    white-space:normal;
+    min-width:80px;
+  }
+  .sc-body .table-wrap{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    margin:0 -14px 14px;
+    padding:0 14px 8px;
+    border:none;
+    border-radius:0;
+  }
+
+  /* ── TIMELINE ── */
+  .tl-step{ font-size:12px; }
+  .tl-desc{ font-size:11px; }
+
+  /* ── CHECKLIST ── */
+  .checklist-item{ padding:8px 12px; }
+  .ci-text{ font-size:12px; }
+
+  /* ── CALLOUTS ── */
+  .callout{ padding:12px 14px; font-size:12px; }
+
+  /* ── EXPAND BAR ── */
+  .expand-bar span{ font-size:8px; }
+
+  /* ── ACTIONS ── */
+  .actions-bar{ flex-direction:column; gap:8px; }
+  .act-btn{ width:100%; text-align:center; padding:13px; }
+
+  /* ── MODAL — overlay scrolls on mobile ── */
+  .modal-overlay{
+    align-items:flex-start;
+    padding:12px;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .modal{
+    padding:22px 16px;
+    width:100%;
+    max-width:100%;
+    margin:8px auto;
+    /* Let content grow naturally — overlay handles scrolling */
+    max-height:none;
+    overflow:visible;
+    border-radius:6px;
+  }
+  .modal h2{ font-size:22px; }
+  .modal-sub{ font-size:12px; margin-bottom:18px; }
+  .bundles{ grid-template-columns:1fr; gap:8px; margin-bottom:16px; }
+  .bundle{ padding:14px 12px; }
+  .b-tokens{ font-size:30px; }
+  .b-price{ font-size:16px; }
+  .pay-btn{ padding:14px; font-size:14px; }
+  .di-cards{ gap:6px; }
+  .di-card{ padding:9px 10px; }
+  .di-title{ font-size:11px; }
+  .di-desc{ font-size:10px; }
+  .redeem-sec{ margin-top:14px; padding-top:14px; }
+  .redeem-row{ flex-direction:column; gap:8px; }
+  .redeem-row input{
+    width:100%;
+    font-size:14px;
+    padding:12px 12px;
+    -webkit-appearance:none;
+    border-radius:3px;
+  }
+  .redeem-btn{ width:100%; padding:12px; font-size:10px; }
+
+  /* ── FOOTER ── */
+  footer{ font-size:10px; padding:20px 0; }
+}
+
+@media(max-width:380px){
+  .wrap{ padding:0 10px; }
+  .hero-left h1{ font-size:22px; }
+  .ph-right{ flex-direction:column; }
+  .ph-stat{ width:100%; }
+}
+
+/* ── PRINT ── */
+@media print{
+  .accent-bar,header,.hero,.form-card,.loading,
+  .actions-bar,.expand-bar,.buy-btn,.token-pill,
+  body::before{display:none!important;}
+  body{background:#fff;color:#000;font-size:11pt;}
+  .section-card{page-break-inside:avoid;border:1px solid #ccc;margin-bottom:12pt;}
+  .sc-body{display:block!important;}
+  .sc-header{cursor:default;background:#f5f5f5;}
+  .sc-toggle{display:none;}
+  .permit-header{background:#1a3a2a;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  footer{display:block!important;text-align:center;padding:16pt 0 0;}
+  footer *{display:none;}
+  footer::after{
+    content:'Evans Engineering & Construction';
+    display:block;font-size:10pt;font-weight:600;color:#1a3a2a;
+    border-top:2px solid #1a3a2a;padding-top:8pt;margin-top:8pt;
+    font-family:'IBM Plex Sans',sans-serif;letter-spacing:0.5px;
+  }
+}
+
+/* Shimmer */
+.section-shimmer{padding:4px 0;}
+.sh-line{height:10px;border-radius:2px;background:var(--rule2);margin-bottom:10px;position:relative;overflow:hidden;}
+.sh-line.w80{width:80%;}
+.sh-line.w90{width:90%;}
+.sh-line.w60{width:60%;}
+.sh-line::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(45,106,79,0.12),transparent);animation:shimmer 1.5s ease infinite;}
+@keyframes shimmer{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
+</style>
+</head>
+<body>
+
+<div class="accent-bar"></div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🏛️</div>
+      <div class="brand-text">
+        <div class="brand-name">Permit<span>AI</span></div>
+        <div class="brand-tag">by Evans Engineering & Construction</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="token-pill">
+        <span class="tp-label">Guides</span>
+        <span class="tp-count" id="token-display">2</span>
+        <span class="tp-unit" id="token-unit-label">free left</span>
+      </div>
+      <button class="buy-btn" onclick="openPaywall()">+ Buy More</button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-left">
+      <h1>Building permits,<em>demystified.</em></h1>
+      <p>Get an exact, country-specific guide to everything you need to submit — documents, drawings, fees, processes, timelines, and contacts — for any project type, anywhere in the world. No more guesswork. No more rejected applications.</p>
+      <div class="hero-badges">
+        <span class="hbadge hbadge-green">✦ 2 Free Guides</span>
+        <span class="hbadge hbadge-amber">50+ Countries</span>
+        <span class="hbadge hbadge-ink">Any Project Type</span>
+        <span class="hbadge hbadge-ink">Draft Letters Included</span>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hr-title">What you get in every guide</div>
+      <div class="process-steps">
+        <div class="ps-item">
+          <div class="ps-num">1</div>
+          <div class="ps-text">
+            <div class="ps-step">Complete Document Checklist</div>
+            <div class="ps-desc">Every required drawing, form, certificate and approval — numbered and organised by submission stage</div>
+          </div>
+        </div>
+        <div class="ps-item">
+          <div class="ps-num">2</div>
+          <div class="ps-text">
+            <div class="ps-step">Step-by-Step Process Guide</div>
+            <div class="ps-desc">The exact sequence of steps, who to visit, what to pay, and realistic timelines for your country</div>
+          </div>
+        </div>
+        <div class="ps-item">
+          <div class="ps-num">3</div>
+          <div class="ps-text">
+            <div class="ps-step">Full Fee Schedule</div>
+            <div class="ps-desc">All applicable fees, levies and charges with current rates and payment methods</div>
+          </div>
+        </div>
+        <div class="ps-item">
+          <div class="ps-num">4</div>
+          <div class="ps-text">
+            <div class="ps-step">Draft Cover Letter</div>
+            <div class="ps-desc">A professional submission letter addressed to the correct authority, ready to customise and sign</div>
+          </div>
+        </div>
+        <div class="ps-item">
+          <div class="ps-num">5</div>
+          <div class="ps-text">
+            <div class="ps-step">Rejection Prevention Tips</div>
+            <div class="ps-desc">The most common reasons applications are rejected in your country — and exactly how to avoid them</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-card">
+    <div class="form-title">Project Information</div>
+    <div class="form-sub">Provide as much detail as possible. The AI uses your project specifics to tailor the guide to the exact regulatory requirements of your country, local authority, and project type — rather than giving you a generic national overview.</div>
+
+    <div class="form-grid">
+      <div class="field span2">
+        <label>Project Location — City, District & Country</label>
+        <input type="text" id="location" placeholder="e.g. Westlands, Nairobi, Kenya — or — Al Barsha, Dubai, UAE — or — Lekki Phase 1, Lagos, Nigeria"/>
+      </div>
+      <div class="field">
+        <label>Country</label>
+        <select id="country">
+          <option value="">Select country...</option>
+          <optgroup label="East Africa">
+            <option>Kenya</option><option>Tanzania</option><option>Uganda</option>
+            <option>Rwanda</option><option>Ethiopia</option><option>Mozambique</option>
+          </optgroup>
+          <optgroup label="West Africa">
+            <option>Nigeria</option><option>Ghana</option><option>Ivory Coast</option>
+            <option>Senegal</option><option>Cameroon</option>
+          </optgroup>
+          <optgroup label="Southern Africa">
+            <option>South Africa</option><option>Zimbabwe</option>
+            <option>Zambia</option><option>Botswana</option><option>Namibia</option>
+          </optgroup>
+          <optgroup label="North Africa">
+            <option>Egypt</option><option>Morocco</option><option>Tunisia</option><option>Algeria</option>
+          </optgroup>
+          <optgroup label="Middle East">
+            <option>UAE</option><option>Saudi Arabia</option><option>Qatar</option>
+            <option>Kuwait</option><option>Oman</option><option>Bahrain</option><option>Jordan</option>
+          </optgroup>
+          <optgroup label="Europe">
+            <option>United Kingdom</option><option>Germany</option><option>France</option>
+            <option>Netherlands</option><option>Spain</option><option>Portugal</option>
+            <option>Sweden</option><option>Norway</option><option>Ireland</option><option>Poland</option>
+          </optgroup>
+          <optgroup label="North America">
+            <option>United States</option><option>Canada</option>
+          </optgroup>
+          <optgroup label="Asia Pacific">
+            <option>Australia</option><option>New Zealand</option><option>Singapore</option>
+            <option>India</option><option>Indonesia</option><option>Philippines</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label>Local Authority / Municipality (if known)</label>
+        <input type="text" id="authority" placeholder="e.g. Nairobi City County — or — Dubai Municipality — or — LASG Ministry of Physical Planning"/>
+      </div>
+    </div>
+
+    <div class="form-divider" data-label="Project Type"></div>
+    <span class="chips-label">Development Type</span>
+    <div class="chips" id="dev-type-chips">
+      <div class="chip active" data-val="Residential House — New Build" onclick="selectChip(this,'dev-type-chips',false)">New Residential House</div>
+      <div class="chip" data-val="Residential Apartment Block" onclick="selectChip(this,'dev-type-chips',false)">Apartment Block</div>
+      <div class="chip" data-val="Commercial Office Building" onclick="selectChip(this,'dev-type-chips',false)">Commercial Office</div>
+      <div class="chip" data-val="Retail / Shopping Development" onclick="selectChip(this,'dev-type-chips',false)">Retail</div>
+      <div class="chip" data-val="Industrial / Warehouse" onclick="selectChip(this,'dev-type-chips',false)">Industrial</div>
+      <div class="chip" data-val="Mixed-Use Development" onclick="selectChip(this,'dev-type-chips',false)">Mixed-Use</div>
+      <div class="chip" data-val="Extension / Addition to Existing Building" onclick="selectChip(this,'dev-type-chips',false)">Extension</div>
+      <div class="chip" data-val="Change of Use" onclick="selectChip(this,'dev-type-chips',false)">Change of Use</div>
+      <div class="chip" data-val="Renovation / Refurbishment" onclick="selectChip(this,'dev-type-chips',false)">Renovation</div>
+      <div class="chip" data-val="Demolition" onclick="selectChip(this,'dev-type-chips',false)">Demolition</div>
+      <div class="chip" data-val="Infrastructure / Civil Works" onclick="selectChip(this,'dev-type-chips',false)">Infrastructure</div>
+      <div class="chip" data-val="Religious / Community Building" onclick="selectChip(this,'dev-type-chips',false)">Community Building</div>
+    </div>
+
+    <div class="form-divider" data-label="Project Scale"></div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Approximate Project Size</label>
+        <input type="text" id="proj-size" placeholder="e.g. 350 m² GFA — or — 3 storeys, 12 units — or — 2-acre site"/>
+      </div>
+      <div class="field">
+        <label>Estimated Construction Value (Optional)</label>
+        <input type="text" id="proj-value" placeholder="e.g. KES 45,000,000 — or — USD 500,000"/>
+      </div>
+      <div class="field">
+        <label>Number of Floors / Storeys</label>
+        <select id="storeys">
+          <option value="">Select...</option>
+          <option>1 storey (bungalow / ground floor only)</option>
+          <option>2 storeys</option><option>3 storeys</option>
+          <option>4 storeys</option><option>5-9 storeys</option>
+          <option>10-20 storeys</option><option>20+ storeys (high-rise)</option>
+          <option>Basement only</option><option>N/A — single level</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Land / Plot Area</label>
+        <input type="text" id="plot-area" placeholder="e.g. 0.25 acres — or — 1,012 m²"/>
+      </div>
+    </div>
+
+    <div class="form-divider" data-label="Planning Context"></div>
+    <span class="chips-label">Land / Zoning Status</span>
+    <div class="chips" id="zoning-chips">
+      <div class="chip active" data-val="Residential zone" onclick="selectChip(this,'zoning-chips',false)">Residential Zone</div>
+      <div class="chip" data-val="Commercial zone" onclick="selectChip(this,'zoning-chips',false)">Commercial Zone</div>
+      <div class="chip" data-val="Mixed-use zone" onclick="selectChip(this,'zoning-chips',false)">Mixed-Use Zone</div>
+      <div class="chip" data-val="Industrial zone" onclick="selectChip(this,'zoning-chips',false)">Industrial Zone</div>
+      <div class="chip" data-val="Agricultural land (change of use required)" onclick="selectChip(this,'zoning-chips',false)">Agricultural</div>
+      <div class="chip" data-val="Unknown / to be confirmed" onclick="selectChip(this,'zoning-chips',false)">Unknown</div>
+    </div>
+
+    <span class="chips-label" style="margin-top:8px;">Current Title / Ownership</span>
+    <div class="chips" id="title-chips">
+      <div class="chip active" data-val="Freehold title" onclick="selectChip(this,'title-chips',false)">Freehold</div>
+      <div class="chip" data-val="Leasehold title" onclick="selectChip(this,'title-chips',false)">Leasehold</div>
+      <div class="chip" data-val="Sectional title" onclick="selectChip(this,'title-chips',false)">Sectional Title</div>
+      <div class="chip" data-val="Title pending / allotment letter" onclick="selectChip(this,'title-chips',false)">Title Pending</div>
+      <div class="chip" data-val="Public land / government allocation" onclick="selectChip(this,'title-chips',false)">Public Land</div>
+      <div class="chip" data-val="Unknown" onclick="selectChip(this,'title-chips',false)">Unknown</div>
+    </div>
+
+    <div class="form-divider" data-label="Additional Context"></div>
+    <div class="form-grid">
+      <div class="field span2">
+        <label>Project Description & Any Special Circumstances</label>
+        <textarea id="proj-desc" placeholder="e.g. 4-bedroom family home on 0.25 acres, Freehold title, Nairobi County. The plot is in a residential zone. We have architectural drawings ready. This is a new build on a vacant plot. Any heritage or conservation considerations? Near a road or utility easement?..."></textarea>
+      </div>
+      <div class="field">
+        <label>Do You Have an Architect / Professional Team?</label>
+        <select id="has-architect">
+          <option>Yes — registered architect appointed</option>
+          <option>Yes — but not yet registered locally</option>
+          <option>No — not yet appointed</option>
+          <option>Owner-builder / self-build</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Stage of Project</label>
+        <select id="stage">
+          <option>Pre-design — just starting out</option>
+          <option>Design stage — drawings in progress</option>
+          <option>Ready to submit — drawings complete</option>
+          <option>Already submitted — need guidance on process</option>
+          <option>Appealing a rejection</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="gen-btn" id="gen-btn" onclick="generatePermitGuide()">
+      🏛️ &nbsp;Generate Permit Guide
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-title">Researching Permit Requirements</div>
+    <p id="loading-msg">Consulting regulatory framework...</p>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+
+    <!-- PERMIT SUMMARY HEADER -->
+    <div class="permit-header" id="permit-header">
+      <div class="ph-left">
+        <div class="ph-label">Building Permit Guide</div>
+        <div class="ph-title" id="ph-title">—</div>
+        <div class="ph-sub" id="ph-sub">—</div>
+      </div>
+      <div class="ph-right">
+        <div class="ph-stat">
+          <div class="ph-stat-label">Approx. Timeline</div>
+          <div class="ph-stat-val" id="ph-timeline">—</div>
+          <div class="ph-stat-sub">weeks typical</div>
+        </div>
+        <div class="ph-stat">
+          <div class="ph-stat-label">Key Authority</div>
+          <div class="ph-stat-val" id="ph-authority" style="font-size:13px;line-height:1.3;">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPAND ALL -->
+    <div class="expand-bar">
+      <span>Permit Guide Sections</span>
+      <button class="expand-all-btn" id="expand-all-btn" onclick="toggleAllSections()">Expand All</button>
+    </div>
+
+    <!-- SECTION CARDS -->
+    <div class="section-card open" id="card-checklist">
+      <div class="sc-header" onclick="toggleSection(this)">
+        <span class="sc-icon">📋</span>
+        <span class="sc-title">Document Submission Checklist</span>
+        <span class="sc-toggle">▼</span>
+      </div>
+      <div class="sc-body" id="sec-checklist">
+        <div class="section-shimmer"><div class="sh-line"></div><div class="sh-line w90"></div><div class="sh-line w80"></div><div class="sh-line w60"></div></div>
+      </div>
+    </div>
+
+    <div class="section-card" id="card-process">
+      <div class="sc-header" onclick="toggleSection(this)">
+        <span class="sc-icon">🗺️</span>
+        <span class="sc-title">Step-by-Step Application Process</span>
+        <span class="sc-toggle">▼</span>
+      </div>
+      <div class="sc-body" id="sec-process">
+        <div class="section-shimmer"><div class="sh-line"></div><div class="sh-line w90"></div><div class="sh-line w80"></div></div>
+      </div>
+    </div>
+
+    <div class="section-card" id="card-fees">
+      <div class="sc-header" onclick="toggleSection(this)">
+        <span class="sc-icon">💵</span>
+        <span class="sc-title">Fee Schedule & Payment Guide</span>
+        <span class="sc-toggle">▼</span>
+      </div>
+      <div class="sc-body" id="sec-fees">
+        <div class="section-shimmer"><div class="sh-line"></div><div class="sh-line w90"></div><div class="sh-line w80"></div></div>
+      </div>
+    </div>
+
+    <div class="section-card" id="card-letter">
+      <div class="sc-header" onclick="toggleSection(this)">
+        <span class="sc-icon">✉️</span>
+        <span class="sc-title">Draft Application Cover Letter</span>
+        <span class="sc-toggle">▼</span>
+      </div>
+      <div class="sc-body" id="sec-letter">
+        <div class="section-shimmer"><div class="sh-line"></div><div class="sh-line w90"></div><div class="sh-line w80"></div></div>
+      </div>
+    </div>
+
+    <div class="section-card" id="card-rejection">
+      <div class="sc-header" onclick="toggleSection(this)">
+        <span class="sc-icon">⚠️</span>
+        <span class="sc-title">Common Rejection Reasons & How to Avoid Them</span>
+        <span class="sc-toggle">▼</span>
+      </div>
+      <div class="sc-body" id="sec-rejection">
+        <div class="section-shimmer"><div class="sh-line"></div><div class="sh-line w90"></div><div class="sh-line w80"></div></div>
+      </div>
+    </div>
+
+    <div class="section-card" id="card-contacts">
+      <div class="sc-header" onclick="toggleSection(this)">
+        <span class="sc-icon">📞</span>
+        <span class="sc-title">Regulatory Contacts & Useful Resources</span>
+        <span class="sc-toggle">▼</span>
+      </div>
+      <div class="sc-body" id="sec-contacts">
+        <div class="section-shimmer"><div class="sh-line"></div><div class="sh-line w90"></div><div class="sh-line w80"></div></div>
+      </div>
+    </div>
+
+    <div class="actions-bar">
+      <button class="act-btn act-primary" onclick="window.print()">⎙ Print / Save PDF</button>
+      <button class="act-btn act-secondary" onclick="newGuide()">↺ New Guide</button>
+    </div>
+  </div>
+
+  <footer>
+    PermitAI by Evans Engineering &amp; Construction<br/>
+    AI-generated guides are indicative only — verify with your local authority before submitting<br/>
+    Covering building permit requirements across 50+ countries globally
+  </footer>
+</div>
+
+<!-- PAYWALL MODAL -->
+<div class="modal-overlay" id="paywall-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closePaywall()">✕</button>
+    <h2>Unlock More Guides</h2>
+    <p class="modal-sub">You've used your <strong>2 free permit guides</strong>. A permit consultant charges <strong>$200–$500</strong> for exactly this guidance. PermitAI delivers it instantly.</p>
+    <div class="bundles">
+      <div class="bundle" data-tokens="8" data-price="8.00" data-label="Starter" onclick="selectBundle(this)">
+        <div class="b-name">Starter</div>
+        <div class="b-tokens">8</div>
+        <div class="b-unit">guides</div>
+        <div class="b-price">$8.00</div>
+        <div class="b-per">$1.00 each</div>
+      </div>
+      <div class="bundle selected" data-tokens="20" data-price="18.00" data-label="Pro" onclick="selectBundle(this)">
+        <div class="b-badge">Best Value</div>
+        <div class="b-name">Pro</div>
+        <div class="b-tokens">20</div>
+        <div class="b-unit">guides</div>
+        <div class="b-price">$18.00</div>
+        <div class="b-per">$0.90 each</div>
+      </div>
+      <div class="bundle" data-tokens="50" data-price="35.00" data-label="Studio" onclick="selectBundle(this)">
+        <div class="b-name">Studio</div>
+        <div class="b-tokens">50</div>
+        <div class="b-unit">guides</div>
+        <div class="b-price">$35.00</div>
+        <div class="b-per">$0.70 each</div>
+      </div>
+    </div>
+    <button class="pay-btn" onclick="goToGumroad()">
+      🛒 Buy Now · <span id="modal-amount">$18.00</span>
+    </button>
+    <div class="di-cards">
+      <div class="di-card"><span class="di-icon">⚡</span><div><div class="di-title">Instant Delivery</div><div class="di-desc">License key emailed automatically the moment payment clears.</div></div></div>
+      <div class="di-card"><span class="di-icon">🔑</span><div><div class="di-title">How to Redeem</div><div class="di-desc">Copy your Gumroad license key and paste it in the box below.</div></div></div>
+      <div class="di-card"><span class="di-icon">🔒</span><div><div class="di-title">Secure Checkout</div><div class="di-desc">Powered by Gumroad — PayPal and all major cards accepted worldwide.</div></div></div>
+    </div>
+    <div class="redeem-sec">
+      <p>Already purchased? Enter your Gumroad license key:</p>
+      <div class="redeem-row">
+        <input type="text" id="redeem-input" placeholder="XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX" maxlength="40"/>
+        <button class="redeem-btn" onclick="redeemCode()">Redeem</button>
+      </div>
+      <div class="redeem-msg" id="redeem-msg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ANTHROPIC_API_KEY = atob('ANTHROPIC_KEY_PLACEHOLDER');
+
+// ── TOKEN SYSTEM ─────────────────────────────────────────────────────────
+function getTokens(){ return parseInt(localStorage.getItem('pa_tokens') ?? '2'); }
+function setTokens(n){ localStorage.setItem('pa_tokens', n); updateTokenDisplay(); }
+function useToken(){ const t=getTokens(); if(t<=0) return false; setTokens(t-1); return true; }
+function isPaidUser(){ return parseInt(localStorage.getItem('pa_total_purchased') ?? '0') > 0; }
+
+function updateTokenDisplay(){
+  const t = getTokens();
+  const el = document.getElementById('token-display');
+  el.textContent = t;
+  el.style.color = t === 0 ? '#e07b39' : '#95d5b2';
+  const unit = document.getElementById('token-unit-label');
+  if(unit) unit.textContent = isPaidUser() ? 'left' : 'free left';
+}
+
+// ── PAYWALL ───────────────────────────────────────────────────────────────
+let selBundle = { tokens:20, price:'18.00', label:'Pro' };
+
+function openPaywall(){
+  document.getElementById('paywall-modal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+}
+function closePaywall(){
+  document.getElementById('paywall-modal').classList.remove('show');
+  document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.width = '';
+}
+function selectBundle(el){
+  document.querySelectorAll('.bundle').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selBundle = { tokens:parseInt(el.dataset.tokens), price:el.dataset.price, label:el.dataset.label };
+  document.getElementById('modal-amount').textContent = '$' + el.dataset.price;
+}
+function goToGumroad(){
+  // ── UPDATE WITH YOUR PERMITAI GUMROAD LINKS ──
+  const links = {
+    'Starter': 'https://maingiverse.gumroad.com/l/stxwvu',
+    'Pro':     'https://maingiverse.gumroad.com/l/mwqcj',
+    'Studio':  'https://maingiverse.gumroad.com/l/vusxze'
+  };
+  window.open(links[selBundle.label] || links['Pro'], '_blank');
+  document.getElementById('redeem-msg').innerHTML =
+    '<span style="color:var(--leaf)">✓ Complete payment on Gumroad — your license key will be emailed instantly. Paste it above to activate.</span>';
+}
+
+// ── GUMROAD PRODUCT IDs — UPDATE AFTER CREATING PRODUCTS ─────────────────
+const GUMROAD_PRODUCTS = {
+  '-e53M2p63MZ4NpPbzGUIew==': 8,   // Starter — 8 guides
+  'qMx7vHver2og1wBZmXgdWg==': 20,  // Pro     — 20 guides
+  '2_FLNDvd2fgUj-QKZSzAdQ==': 50,  // Studio  — 50 guides
+};
+
+async function redeemCode(){
+  const key = document.getElementById('redeem-input').value.trim();
+  const msgEl = document.getElementById('redeem-msg');
+  if(!key){ msgEl.innerHTML = '<span style="color:var(--amber)">Please enter your license key.</span>'; return; }
+  const used = JSON.parse(localStorage.getItem('pa_used_keys') || '[]');
+  if(used.includes(key.toUpperCase())){ msgEl.innerHTML = '<span style="color:var(--amber)">⚠ Key already redeemed.</span>'; return; }
+  msgEl.innerHTML = '<span style="color:var(--muted)">⏳ Verifying...</span>';
+  document.querySelector('.redeem-btn').disabled = true;
+  let verified = false, tokensToAdd = 0, prodName = '';
+  for(const [pid, tokens] of Object.entries(GUMROAD_PRODUCTS)){
+    try{
+      const r = await fetch('https://api.gumroad.com/v2/licenses/verify', {
+        method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({product_id:pid, license_key:key, increment_uses_count:'true'})
+      });
+      const d = await r.json();
+      if(d.success && d.purchase){
+        if(d.uses > 1){ msgEl.innerHTML = '<span style="color:var(--amber)">⚠ Key already used.</span>'; document.querySelector('.redeem-btn').disabled = false; return; }
+        verified = true; tokensToAdd = tokens;
+        prodName = tokens === 8 ? 'Starter (8 guides)' : tokens === 20 ? 'Pro (20 guides)' : 'Studio (50 guides)';
+        break;
+      }
+    }catch(e){}
+  }
+  document.querySelector('.redeem-btn').disabled = false;
+  if(!verified){ msgEl.innerHTML = '<span style="color:var(--amber)">⚠ Key not found. Check your Gumroad email.</span>'; return; }
+  const newTotal = getTokens() + tokensToAdd;
+  setTokens(newTotal);
+  localStorage.setItem('pa_total_purchased', parseInt(localStorage.getItem('pa_total_purchased') || '0') + tokensToAdd);
+  used.push(key.toUpperCase());
+  localStorage.setItem('pa_used_keys', JSON.stringify(used));
+  document.getElementById('redeem-input').value = '';
+  msgEl.innerHTML = `<span style="color:var(--leaf)">✓ ${prodName} activated! ${tokensToAdd} guides added. You now have ${newTotal} remaining.</span>`;
+  setTimeout(() => closePaywall(), 2500);
+}
+
+// ── CHIPS ─────────────────────────────────────────────────────────────────
+function selectChip(chip, groupId, multi){
+  if(!multi){
+    document.getElementById(groupId).querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  } else {
+    chip.classList.toggle('active');
+  }
+}
+function getChipVal(groupId){ return document.querySelector('#'+groupId+' .chip.active')?.dataset.val || ''; }
+
+// ── SECTION ACCORDION ─────────────────────────────────────────────────────
+function toggleSection(headerEl){
+  const card = headerEl.closest('.section-card');
+  card.classList.toggle('open');
+  updateExpandBtn();
+}
+function toggleAllSections(){
+  const cards = document.querySelectorAll('.section-card');
+  const anyOpen = [...cards].some(c => c.classList.contains('open'));
+  cards.forEach(c => anyOpen ? c.classList.remove('open') : c.classList.add('open'));
+  updateExpandBtn();
+}
+function updateExpandBtn(){
+  const btn = document.getElementById('expand-all-btn');
+  if(!btn) return;
+  const anyOpen = [...document.querySelectorAll('.section-card')].some(c => c.classList.contains('open'));
+  btn.textContent = anyOpen ? 'Collapse All' : 'Expand All';
+}
+
+// ── API CALL ──────────────────────────────────────────────────────────────
+async function callAPI(prompt, maxTokens){
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: maxTokens || 4096,
+      messages: [{ role:"user", content:prompt }]
+    })
+  });
+  const data = await res.json();
+  if(data.error) throw new Error('API Error: ' + data.error.type + ' — ' + data.error.message);
+  if(!data.content || !data.content.length) throw new Error('Empty API response. Status: ' + res.status);
+  return data.content.map(i => i.text || '').join('');
+}
+
+// ── PROMPTS ───────────────────────────────────────────────────────────────
+function buildPrompt(section, inputs){
+  const ctx = `PROJECT: ${inputs.devType} | LOCATION: ${inputs.location} | COUNTRY: ${inputs.country} | LOCAL AUTHORITY: ${inputs.authority || 'Primary building authority for '+inputs.country} | ZONING: ${inputs.zoning} | TITLE: ${inputs.title} | SIZE: ${inputs.projSize || 'Not specified'} | VALUE: ${inputs.projValue || 'Not specified'} | STOREYS: ${inputs.storeys || 'Not specified'} | PLOT: ${inputs.plotArea || 'Not specified'} | ARCHITECT: ${inputs.hasArchitect} | STAGE: ${inputs.stage} | DESCRIPTION: ${inputs.desc || 'Standard project'}`;
+
+  const identity = `You are a Senior Building Control Officer and Planning Consultant with 25 years of direct experience processing building permit applications in ${inputs.country}. You have personally reviewed thousands of applications and know exactly what the ${inputs.authority || 'relevant authority'} requires, what gets approved, and what gets rejected. You are intimately familiar with the building regulations, planning legislation, and approval processes of ${inputs.country}.`;
+
+  const mandate = `You are generating a section of a BUILDING PERMIT GUIDE for this specific project. Use <h3> for major headings, <h4> for sub-headings, <ul>/<ol> for lists, and <table> tags for all tabular data. Tables must be wrapped in <div class="table-wrap"> for mobile scrolling. Write minimum 500 words of substantive, accurate, country-specific content. ZERO generic filler. Reference real regulatory bodies, Acts, forms, and fees for ${inputs.country}. Respond with HTML only — no preamble, no JSON.`;
+
+  const prompts = {
+
+    meta: `${identity}\n\nProject: ${ctx}\n\nGenerate the header metadata for this permit guide. Respond with ONLY valid JSON (no markdown):\n{"guideTitle":"<formal title e.g. Building Permit Application Guide — 4-Bedroom Residential House, Westlands, Nairobi, Kenya>","guideSub":"<one sentence describing what this guide covers>","approxTimeline":"<realistic number of weeks for approval in ${inputs.country} for this project type e.g. 8-12>","keyAuthority":"<short name of the primary approving authority e.g. NCA / Nairobi City County>"}`,
+
+    checklist: `${identity}\n\n${mandate}\n\nSECTION: COMPLETE DOCUMENT SUBMISSION CHECKLIST\n\nGenerate a comprehensive, exhaustive checklist of every document, drawing, form, certificate, and approval required to submit a building permit application for this project in ${inputs.country}.\n\nOrganise the checklist into clear stages:\n\n1. PRE-APPLICATION REQUIREMENTS — documents to obtain before you can even submit (title documents, ownership proofs, planning consents, etc.)\n\n2. ARCHITECTURAL AND STRUCTURAL DRAWINGS — every drawing type required, including scale requirements, what must be shown, and how many copies. Be specific to ${inputs.country} building code requirements.\n\n3. STATUTORY APPROVALS AND CLEARANCES — all parallel approvals needed from other agencies (environmental, fire, water/sewerage, roads, etc.) specific to ${inputs.country}\n\n4. PROFESSIONAL CERTIFICATIONS — all sign-offs required from registered professionals. Name the specific registration bodies in ${inputs.country} (e.g. Board of Registration of Architects and Quantity Surveyors (BORAQS) for Kenya)\n\n5. FORMS AND APPLICATIONS — every official form that must be completed. Name the actual form numbers/names used in ${inputs.country}\n\n6. FINANCIAL REQUIREMENTS — deposit receipts, fee payments, bonds if required\n\nFor each item: state whether it is MANDATORY, STANDARD, or CONDITIONAL. State the number of copies required. State any specific requirements or common mistakes. Format as a numbered list with status badges using spans like <span class="ci-req ci-mandatory">Mandatory</span>`,
+
+    process: `${identity}\n\n${mandate}\n\nSECTION: STEP-BY-STEP APPLICATION PROCESS AND TIMELINE\n\nWrite the complete, sequential process for obtaining a building permit for this project in ${inputs.country}. This must be the REAL process as it actually works — including informal realities, common delays, and practical tips.\n\nFor each step provide:\n- The exact action to take\n- Who to contact / which office to visit\n- What to bring / submit\n- How long this step typically takes\n- Any fees payable at this step\n- Practical tips to speed up or avoid problems\n\nInclude:\n1. Pre-application consultation (if applicable and recommended in ${inputs.country})\n2. Preparation and assembly of documents\n3. First submission — where, how, and to whom\n4. Technical review stage — who reviews, what they look for\n5. Statutory agency referrals — which agencies must clear the application\n6. Queries and revision requests — how these work, typical turnaround\n7. Approval and permit issuance — the actual permit document, what it says, how long it is valid\n8. Post-approval requirements — inspections, NCA/authority notifications before work starts\n9. During construction — required inspections at key stages\n10. Final inspection and occupation certificate/certificate of practical completion\n\nInclude a realistic timeline table showing: Stage | Duration | Cumulative Time | Notes`,
+
+    fees: `${identity}\n\n${mandate}\n\nSECTION: COMPLETE FEE SCHEDULE AND PAYMENT GUIDE\n\nProvide a comprehensive breakdown of ALL fees, levies, charges, and deposits applicable to this building permit application in ${inputs.country}.\n\nInclude:\n1. PERMIT APPLICATION FEES — the primary building permit fee. In ${inputs.country} this is typically calculated on project value or floor area. Show the actual formula/rate table used and calculate an indicative fee for this project.\n\n2. STATUTORY AGENCY FEES — fees payable to parallel approval bodies (environmental impact assessment fees, fire authority fees, water/sewerage connection charges, road reserve fees, etc.) — specific to ${inputs.country}\n\n3. PROFESSIONAL FEES — indicative fees for the professional team required (architect, structural engineer, services engineer, project manager) — use ${inputs.country} market rates\n\n4. GOVERNMENT LEVIES — any development levies, infrastructure contributions, or local authority charges\n\n5. TOTAL COST ESTIMATE — a summary table showing all fees with subtotals and an estimated total cost of obtaining the permit\n\nFormat fees as an HTML table wrapped in <div class="table-wrap">: Fee Type | Basis of Calculation | Indicative Amount | Payable To | When Payable\n\nAlso explain: accepted payment methods in ${inputs.country}; how to get receipts; what to do if you disagree with an assessed fee.`,
+
+    letter: `${identity}\n\n${mandate}\n\nSECTION: DRAFT APPLICATION COVER LETTER\n\nWrite a complete, professional, ready-to-use draft cover letter for this building permit application in ${inputs.country}.\n\nThe letter must:\n- Be addressed to the correct authority for ${inputs.country} (use the actual title and name of the position, e.g. "The Director, Physical Planning, Nairobi City County")\n- Use the correct formal salutation and letter format for ${inputs.country}\n- Reference the correct legislation under which the application is being made (name the actual Building Code / Physical Planning Act / Local Government Act applicable in ${inputs.country})\n- State all key project details clearly\n- List the documents enclosed (draw from the checklist)\n- Request the permit in formal language appropriate for ${inputs.country}\n- Include standard professional closing\n- Include placeholders in [SQUARE BRACKETS] for applicant-specific information to be filled in\n\nFormat the letter properly with: [Date], [Reference], Addressee block, Subject line, Body paragraphs, Yours faithfully, [Signature block]. Make it look like a real professional submission letter, not a template.`,
+
+    rejection: `${identity}\n\n${mandate}\n\nSECTION: COMMON REJECTION REASONS AND HOW TO AVOID THEM\n\nDraw on your 25 years of experience processing applications in ${inputs.country} to write a detailed, practical guide to avoiding rejection.\n\nFor this specific project type (${inputs.devType}) in ${inputs.country}, cover:\n\n1. THE TOP 10 MOST COMMON REASONS APPLICATIONS ARE REJECTED — specific to ${inputs.country} and this project type. For each: describe exactly what the problem is, why authorities reject for this reason, and the exact remedy.\n\nFormat as a table: Rejection Reason | Why It Causes Rejection | How to Avoid It | Severity (High/Medium/Low)\n\n2. DRAWING DEFICIENCIES — the most common drawing errors and omissions that cause rejection in ${inputs.country}. What level of detail is actually required. Which drawing elements are most often wrong.\n\n3. DOCUMENTATION GAPS — the documents most commonly missing or incorrectly certified in ${inputs.country}\n\n4. PROCESS ERRORS — procedural mistakes that cause delays or rejections (wrong office, wrong sequence, incomplete forms)\n\n5. APPEAL PROCESS — if your application is rejected, what are your rights, what is the appeal procedure in ${inputs.country}, and what are realistic timescales\n\n6. PROFESSIONAL TIPS — 5 insider tips from a building control officer's perspective for getting this application approved first time`,
+
+    contacts: `${identity}\n\n${mandate}\n\nSECTION: REGULATORY CONTACTS, USEFUL RESOURCES AND PROFESSIONAL GUIDANCE\n\nProvide a comprehensive contacts and resources section for building permit applications in ${inputs.country}.\n\nInclude:\n\n1. PRIMARY APPROVAL AUTHORITY — full name, physical address, postal address, telephone, email, website, and office hours. Note any online portal or e-submission system if available in ${inputs.country}.\n\n2. STATUTORY CONSULTATION BODIES — table of all agencies that must clear the application with their contact details: Agency | Role | Contact Details | Typical Turnaround\n\n3. PROFESSIONAL REGISTRATION BODIES — the bodies that register architects, engineers, and quantity surveyors in ${inputs.country}. How to verify that your professional team is registered. Website for checking registration.\n\n4. RELEVANT LEGISLATION AND REGULATIONS — list the key Acts, Regulations, Standards, and Codes that govern building permits in ${inputs.country}. State where to obtain official copies.\n\n5. ONLINE RESOURCES — any official online portals, e-permit systems, or government websites relevant to building permits in ${inputs.country}\n\n6. PROFESSIONAL ASSOCIATIONS — key industry bodies in ${inputs.country} that can recommend qualified professionals (architects, engineers, permit expeditors)\n\n7. IMPORTANT NOTE ON ACCURACY — include a standard disclaimer that regulatory requirements change, fees are updated periodically, and the applicant should verify current requirements directly with the relevant authority before submission.`
+  };
+
+  return prompts[section];
+}
+
+// ── MAIN GENERATE ─────────────────────────────────────────────────────────
+async function generatePermitGuide(){
+  if(getTokens() <= 0){ openPaywall(); return; }
+
+  if(!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY === 'ANTHROPIC_KEY_PLACEHOLDER' || ANTHROPIC_API_KEY.length < 10){
+    alert('⚠️ API key not configured. Check GitHub Actions secrets.'); return;
+  }
+
+  const country = document.getElementById('country').value;
+  const location = document.getElementById('location').value.trim();
+  if(!country){ alert('Please select a country.'); return; }
+  if(!location){ alert('Please enter the project location.'); return; }
+
+  const inputs = {
+    location,
+    country,
+    authority: document.getElementById('authority').value.trim(),
+    devType: getChipVal('dev-type-chips'),
+    zoning: getChipVal('zoning-chips'),
+    title: getChipVal('title-chips'),
+    projSize: document.getElementById('proj-size').value.trim(),
+    projValue: document.getElementById('proj-value').value.trim(),
+    storeys: document.getElementById('storeys').value,
+    plotArea: document.getElementById('plot-area').value.trim(),
+    desc: document.getElementById('proj-desc').value.trim(),
+    hasArchitect: document.getElementById('has-architect').value,
+    stage: document.getElementById('stage').value
+  };
+
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('loading').classList.add('show');
+
+  const msgs = [
+    'Consulting regulatory framework...',
+    'Compiling document checklist...',
+    'Researching fee schedules...',
+    'Drafting cover letter...',
+    'Analysing rejection patterns...',
+    'Compiling contacts & resources...',
+  ];
+  let mi = 0;
+  const msgEl = document.getElementById('loading-msg');
+  const ticker = setInterval(() => { mi = (mi+1) % msgs.length; msgEl.textContent = msgs[mi]; }, 1600);
+
+  try{
+    // Step 1: Get metadata
+    const metaText = await callAPI(buildPrompt('meta', inputs), 600);
+    const s = metaText.indexOf('{'), e = metaText.lastIndexOf('}');
+    let meta = {};
+    if(s !== -1 && e !== -1){ try{ meta = JSON.parse(metaText.substring(s, e+1)); }catch(err){} }
+
+    // Render header immediately
+    document.getElementById('ph-title').textContent = meta.guideTitle || inputs.devType + ' — ' + inputs.location;
+    document.getElementById('ph-sub').textContent = meta.guideSub || 'Building permit requirements for ' + inputs.country;
+    document.getElementById('ph-timeline').textContent = meta.approxTimeline || '—';
+    document.getElementById('ph-authority').textContent = meta.keyAuthority || inputs.authority || inputs.country + ' Authority';
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+
+    // Step 2: Generate all 6 content sections in parallel
+    msgEl.textContent = 'Writing full permit guide...';
+    const [checklistHtml, processHtml, feesHtml, letterHtml, rejectionHtml, contactsHtml] = await Promise.all([
+      callAPI(buildPrompt('checklist', inputs), 3500),
+      callAPI(buildPrompt('process', inputs), 3000),
+      callAPI(buildPrompt('fees', inputs), 2500),
+      callAPI(buildPrompt('letter', inputs), 2000),
+      callAPI(buildPrompt('rejection', inputs), 2500),
+      callAPI(buildPrompt('contacts', inputs), 2000)
+    ]);
+
+    const clean = html => html.replace(/^```html[\s]?/i,'').replace(/```$/m,'').trim();
+    document.getElementById('sec-checklist').innerHTML  = clean(checklistHtml);
+    document.getElementById('sec-process').innerHTML   = clean(processHtml);
+    document.getElementById('sec-fees').innerHTML      = clean(feesHtml);
+    document.getElementById('sec-letter').innerHTML    = clean(letterHtml);
+    document.getElementById('sec-rejection').innerHTML = clean(rejectionHtml);
+    document.getElementById('sec-contacts').innerHTML  = clean(contactsHtml);
+
+    useToken();
+    clearInterval(ticker);
+    document.getElementById('loading').classList.remove('show');
+    btn.disabled = false;
+    updateExpandBtn();
+    syncHeight();
+
+    const remaining = getTokens();
+    if(remaining === 1) setTimeout(() => { if(confirm('⚠️ Only 1 guide left! Top up now?')) openPaywall(); }, 2000);
+    else if(remaining === 0) setTimeout(() => openPaywall(), 2500);
+
+  }catch(err){
+    clearInterval(ticker);
+    document.getElementById('loading').classList.remove('show');
+    btn.disabled = false;
+    console.error('PermitAI error:', err);
+    alert('Generation failed: ' + (err.message || String(err)));
+  }
+}
+
+// ── UTILITY ───────────────────────────────────────────────────────────────
+function newGuide(){
+  document.getElementById('results').style.display = 'none';
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function syncHeight(){
+  const h = Math.max(
+    document.body.scrollHeight, document.body.offsetHeight,
+    document.documentElement.scrollHeight, document.documentElement.offsetHeight
+  );
+  window.parent.postMessage({ type:'wix-iframe-height', height:h }, '*');
+  window.parent.postMessage({ height:h }, '*');
+  if(window.wixEmbedsAPI?.resizeWindow) window.wixEmbedsAPI.resizeWindow({ height:h });
+}
+
+window.addEventListener('load', () => {
+  updateTokenDisplay();
+  syncHeight();
+  const obs = new MutationObserver(() => syncHeight());
+  obs.observe(document.body, { childList:true, subtree:true, attributes:true });
+  window.addEventListener('resize', syncHeight);
+  setTimeout(syncHeight, 500);
+  setTimeout(syncHeight, 1500);
+});
+document.getElementById('paywall-modal').addEventListener('click', e => {
+  if(e.target.id === 'paywall-modal') closePaywall();
+});
+</script>
+</body>
+</html>
